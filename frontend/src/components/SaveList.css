@@ -1,0 +1,30 @@
+.save-list h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.saves-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.loading,
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #dee2e6;
+}
+
+@media (max-width: 768px) {
+  .saves-grid {
+    grid-template-columns: 1fr;
+  }
+}
