@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -25,19 +26,23 @@ app.get('/api/health', (req, res) => {
 
 // Serve static files from frontend build
 const frontendPath = path.join(__dirname, '../frontend/build');
-console.log('Serving static files from:', frontendPath);
+console.log('Frontend path:', frontendPath);
+console.log('Frontend path exists:', fs.existsSync(frontendPath));
+
+// Serve all static files
 app.use(express.static(frontendPath));
 
 // For any route not matching API, serve index.html
 app.get('*', (req, res) => {
-  const indexPath = path.join(frontendPath, 'index.html');
-  console.log('Attempting to serve index.html from:', indexPath);
+  console.log('Catch-all route hit for:', req.path);
   
   if (!req.path.startsWith('/api')) {
+    const indexPath = path.join(frontendPath, 'index.html');
+    console.log('Serving index.html from:', indexPath);
     res.sendFile(indexPath, (err) => {
       if (err) {
         console.error('Error serving index.html:', err.message);
-        res.status(500).send('Error loading app');
+        res.status(500).send('Error loading app: ' + err.message);
       }
     });
   } else {
