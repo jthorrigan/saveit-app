@@ -1,11 +1,1 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaveIt App</title>
-</head>
-<body>
-    <div id="root"></div>
-</body>
-</html>
+{"name": "saveit-app", "version": "1.0.0", "private": true, "dependencies": {"react": "^17.0.2", "react-dom": "^17.0.2"},"scripts": {"start": "react-scripts start","build": "react-scripts build","test": "react-scripts test","eject": "react-scripts eject"},"eslintConfig": {"extends": ["react-app", "react-app/jest"]},"browserslist": [">0.2%", "not dead", "not op_mini all"]}
