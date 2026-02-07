@@ -24,7 +24,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve static files from frontend public
-const frontendPath = path.join(__dirname, '../frontend/public');
+const frontendPath = path.join(__dirname, '../frontend/build');
 app.use(express.static(frontendPath));
 
 // For any route not matching API, serve index.html
