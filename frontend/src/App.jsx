@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import SaveForm from './components/SaveForm';
 import SaveList from './components/SaveList';
@@ -18,8 +18,8 @@ function App() {
   const [editingSave, setEditingSave] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch saves
-  const fetchSaves = async () => {
+  // Fetch saves - wrapped in useCallback to prevent dependency issues
+  const fetchSaves = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get('/saves', { params: filters });
@@ -30,7 +30,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   // Fetch categories
   const fetchCategories = async () => {
@@ -48,7 +48,7 @@ function App() {
 
   useEffect(() => {
     fetchSaves();
-  }, [filters]);
+  }, [fetchSaves]);
 
   const handleSaveSubmit = async (saveData) => {
     try {
