@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -14,13 +15,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const savesRoutes = require('./routes/saves');
 const categoriesRoutes = require('./routes/categories');
 
-// Use routes
+// API routes
 app.use('/api/saves', savesRoutes);
 app.use('/api/categories', categoriesRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });
+});
+
+// Serve static files from frontend build (if it exists)
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// Catch-all route - serve index.html for any non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
 });
 
 // Error handling middleware
