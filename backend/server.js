@@ -23,14 +23,23 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
-// Serve static files from frontend public
+// Serve static files from frontend build
 const frontendPath = path.join(__dirname, '../frontend/build');
+console.log('Serving static files from:', frontendPath);
 app.use(express.static(frontendPath));
 
 // For any route not matching API, serve index.html
 app.get('*', (req, res) => {
+  const indexPath = path.join(frontendPath, 'index.html');
+  console.log('Attempting to serve index.html from:', indexPath);
+  
   if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(frontendPath, 'index.html'));
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('Error serving index.html:', err.message);
+        res.status(500).send('Error loading app');
+      }
+    });
   } else {
     res.status(404).json({ error: 'API route not found' });
   }
