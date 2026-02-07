@@ -1,0 +1,11 @@
+{
+  "name": "saveit-app",
+  "version": "1.0.0",
+  "description": "Save it - A web app to save articles, links, and content for later",
+  "scripts": {
+    "start:backend": "cd backend && npm install && npm start",
+    "start:frontend": "cd frontend && npm install && npm start",
+    "start:all": "npm run start:backend & npm run start:frontend",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  }
+}
