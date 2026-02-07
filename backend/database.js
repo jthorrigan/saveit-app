@@ -1,12 +1,26 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
 const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'database.db');
-const db = new sqlite3.Database(dbPath);
+
+// Create database file if it doesn't exist
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Error opening database:', err);
+  } else {
+    console.log('Connected to SQLite database at:', dbPath);
+  }
+});
+
+// Enable foreign keys
+db.run('PRAGMA foreign_keys = ON', (err) => {
+  if (err) console.error('Error enabling foreign keys:', err);
+});
 
 // Initialize database tables
 db.serialize(() => {
-  // Creates table
+  // Saves table
   db.run(`
     CREATE TABLE IF NOT EXISTS saves (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,7 +32,10 @@ db.serialize(() => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `);
+  `, (err) => {
+    if (err) console.error('Error creating saves table:', err);
+    else console.log('Saves table ready');
+  });
 
   // Categories table
   db.run(`
@@ -27,7 +44,10 @@ db.serialize(() => {
       name TEXT NOT NULL UNIQUE,
       description TEXT
     )
-  `);
+  `, (err) => {
+    if (err) console.error('Error creating categories table:', err);
+    else console.log('Categories table ready');
+  });
 
   // Junction table for many-to-many relationship
   db.run(`
@@ -38,12 +58,11 @@ db.serialize(() => {
       FOREIGN KEY (save_id) REFERENCES saves(id) ON DELETE CASCADE,
       FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
     )
-  `);
-
-  // Create indexes for faster queries
-  db.run(`CREATE INDEX IF NOT EXISTS idx_saves_source_type ON saves(source_type)`);
-  db.run(`CREATE INDEX IF NOT EXISTS idx_saves_created_at ON saves(created_at)`);
-  db.run(`CREATE INDEX IF NOT EXISTS idx_saves_categories_save_id ON saves_categories(save_id)`);
+  `, (err) => {
+    if (err) console.error('Error creating saves_categories table:', err);
+    else console.log('Saves_categories table ready');
+  });
 });
 
+// Export database connection
 module.exports = db;
