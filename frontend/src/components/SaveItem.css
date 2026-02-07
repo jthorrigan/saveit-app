@@ -1,0 +1,149 @@
+.save-item {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.save-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.save-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.save-title {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  flex: 1;
+  word-break: break-word;
+}
+
+.source-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.save-url {
+  display: block;
+  color: #667eea;
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  word-break: break-all;
+  transition: color 0.3s;
+}
+
+.save-url:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+.save-description {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.save-notes-section {
+  margin: 10px 0;
+}
+
+.notes-toggle {
+  background: #f8f9fa;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #495057;
+  transition: background 0.3s;
+}
+
+.notes-toggle:hover {
+  background: #e9ecef;
+}
+
+.save-notes {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #495057;
+  line-height: 1.5;
+  border-left: 3px solid #667eea;
+}
+
+.save-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid #e9ecef;
+}
+
+.save-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.save-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-edit,
+.btn-delete {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.btn-edit {
+  background: #e7f5ff;
+  color: #0066cc;
+}
+
+.btn-edit:hover {
+  background: #d0ebff;
+}
+
+.btn-delete {
+  flex: 0.3;
+  padding: 8px;
+  background: #fff3cd;
+  color: #856404;
+  font-size: 1rem;
+  position: relative;
+}
+
+.btn-delete:hover {
+  background: #ffe69c;
+  transform: scale(1.05);
+}
+
+.btn-delete:active {
+  transform: scale(0.95);
+}
