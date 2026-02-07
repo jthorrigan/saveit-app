@@ -6,37 +6,28 @@ const db = require('../database');
 router.get('/', (req, res) => {
   const { sourceType, category, sortBy = 'created_at', order = 'DESC', search } = req.query;
 
-  let query = `
-    SELECT DISTINCT s.* FROM saves s
-    LEFT JOIN saves_categories sc ON s.id = sc.save_id
-    LEFT JOIN categories c ON sc.category_id = c.id
-    WHERE 1=1
-  `;
+  let query = `SELECT * FROM saves WHERE 1=1`;
   const params = [];
 
   if (sourceType) {
-    query += ` AND s.source_type = ?`;
+    query += ` AND source_type = ?`;
     params.push(sourceType);
   }
 
-  if (category) {
-    query += ` AND c.name = ?`;
-    params.push(category);
-  }
-
   if (search) {
-    query += ` AND (s.title LIKE ? OR s.description LIKE ? OR s.notes LIKE ?)`;
+    query += ` AND (title LIKE ? OR description LIKE ? OR notes LIKE ?)`;
     const searchTerm = `%${search}%`;
     params.push(searchTerm, searchTerm, searchTerm);
   }
 
-  query += ` ORDER BY s.${sortBy} ${order}`;
+  query += ` ORDER BY ${sortBy} ${order}`;
 
   db.all(query, params, (err, rows) => {
     if (err) {
+      console.error('Database error:', err);
       return res.status(500).json({ error: err.message });
     }
-    res.json(rows);
+    res.json(rows || []);
   });
 });
 
@@ -46,31 +37,21 @@ router.get('/:id', (req, res) => {
 
   db.get(`SELECT * FROM saves WHERE id = ?`, [id], (err, row) => {
     if (err) {
+      console.error('Database error:', err);
       return res.status(500).json({ error: err.message });
     }
     if (!row) {
       return res.status(404).json({ error: 'Save not found' });
     }
-
-    // Get categories for this save
-    db.all(
-      `SELECT c.* FROM categories c
-       JOIN saves_categories sc ON c.id = sc.category_id
-       WHERE sc.save_id = ?`,
-      [id],
-      (err, categories) => {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
-        res.json({ ...row, categories });
-      }
-    );
+    res.json(row);
   });
 });
 
 // CREATE new save
 router.post('/', (req, res) => {
   const { title, url, description, source_type, notes, categories } = req.body;
+
+  console.log('Creating save:', { title, source_type });
 
   if (!title || !source_type) {
     return res.status(400).json({ error: 'Title and source_type are required' });
@@ -79,26 +60,15 @@ router.post('/', (req, res) => {
   db.run(
     `INSERT INTO saves (title, url, description, source_type, notes)
      VALUES (?, ?, ?, ?, ?)`,
-    [title, url, description, source_type, notes],
+    [title, url || '', description || '', source_type, notes || ''],
     function (err) {
       if (err) {
+        console.error('Database error:', err);
         return res.status(500).json({ error: err.message });
       }
 
       const saveId = this.lastID;
-
-      // Add categories if provided
-      if (categories && categories.length > 0) {
-        categories.forEach((categoryId) => {
-          db.run(
-            `INSERT INTO saves_categories (save_id, category_id) VALUES (?, ?)`,
-            [saveId, categoryId],
-            (err) => {
-              if (err) console.error(err);
-            }
-          );
-        });
-      }
+      console.log('Save created with ID:', saveId);
 
       res.status(201).json({ id: saveId, message: 'Save created successfully' });
     }
@@ -108,7 +78,7 @@ router.post('/', (req, res) => {
 // UPDATE save
 router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const { title, url, description, source_type, notes, categories } = req.body;
+  const { title, url, description, source_type, notes } = req.body;
 
   if (!title || !source_type) {
     return res.status(400).json({ error: 'Title and source_type are required' });
@@ -117,9 +87,10 @@ router.put('/:id', (req, res) => {
   db.run(
     `UPDATE saves SET title = ?, url = ?, description = ?, source_type = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
      WHERE id = ?`,
-    [title, url, description, source_type, notes, id],
+    [title, url || '', description || '', source_type, notes || '', id],
     function (err) {
       if (err) {
+        console.error('Database error:', err);
         return res.status(500).json({ error: err.message });
       }
 
@@ -127,26 +98,7 @@ router.put('/:id', (req, res) => {
         return res.status(404).json({ error: 'Save not found' });
       }
 
-      // Update categories
-      db.run(`DELETE FROM saves_categories WHERE save_id = ?`, [id], (err) => {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
-
-        if (categories && categories.length > 0) {
-          categories.forEach((categoryId) => {
-            db.run(
-              `INSERT INTO saves_categories (save_id, category_id) VALUES (?, ?)`,
-              [id, categoryId],
-              (err) => {
-                if (err) console.error(err);
-              }
-            );
-          });
-        }
-
-        res.json({ message: 'Save updated successfully' });
-      });
+      res.json({ message: 'Save updated successfully' });
     }
   );
 });
@@ -157,6 +109,7 @@ router.delete('/:id', (req, res) => {
 
   db.run(`DELETE FROM saves WHERE id = ?`, [id], function (err) {
     if (err) {
+      console.error('Database error:', err);
       return res.status(500).json({ error: err.message });
     }
 
