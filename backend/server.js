@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -24,18 +23,16 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
-// Serve static files from frontend build (if it exists)
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-// Catch-all route - serve index.html for any non-API routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+// 404 handler for non-API routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  console.error('Server error:', err.message);
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  res.status(500).json({ error: 'Server error: ' + err.message });
 });
 
 // Start server
