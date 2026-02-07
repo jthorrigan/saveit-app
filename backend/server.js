@@ -11,35 +11,40 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Import routes
+// API routes FIRST
 const savesRoutes = require('./routes/saves');
 const categoriesRoutes = require('./routes/categories');
 
-// API routes
 app.use('/api/saves', savesRoutes);
 app.use('/api/categories', categoriesRoutes);
 
-// Health check endpoint
+// Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 
-// Serve static files from frontend src (development mode)
-app.use(express.static(path.join(__dirname, '../frontend/public')));
+// Serve static files from frontend public
+const frontendPath = path.join(__dirname, '../frontend/public');
+app.use(express.static(frontendPath));
 
-// For development - serve React index.html on root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+// For any route not matching API, serve index.html
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  } else {
+    res.status(404).json({ error: 'API route not found' });
+  }
 });
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error('Server error:', err.message);
   res.status(500).json({ error: 'Server error: ' + err.message });
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`API available at http://localhost:${PORT}/api`);
+  console.log(`Frontend available at http://localhost:${PORT}`);
 });
