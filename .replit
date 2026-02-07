@@ -1,1 +1,1 @@
-run = "npm run start:all"
+run = "cd backend && npm install && npm start"
